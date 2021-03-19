@@ -1,0 +1,12 @@
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/bin/Debug/net5.0/OpenProvider.NET.deps.json
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/bin/Debug/net5.0/OpenProvider.NET.dll
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/bin/Debug/net5.0/ref/OpenProvider.NET.dll
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/bin/Debug/net5.0/OpenProvider.NET.pdb
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.csprojAssemblyReference.cache
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.GeneratedMSBuildEditorConfig.editorconfig
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.AssemblyInfoInputs.cache
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.AssemblyInfo.cs
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.csproj.CoreCompileInputs.cache
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.dll
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/ref/OpenProvider.NET.dll
+/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/obj/Debug/net5.0/OpenProvider.NET.pdb

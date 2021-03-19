@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "H/enSwUQPyH6G2kGFdL2Ps+nPPRt0/9NMQAa4wkVBKfCWXe+yDc121Ye20FuXirhQIko0g+dtNUqqxTsKskNTg==",
+  "success": true,
+  "projectFilePath": "/home/menno/Documents/Projects/MintyHosting/OpenProvider.NET/OpenProvider.NET.csproj",
+  "expectedPackageFiles": [
+    "/home/menno/.nuget/packages/nager.publicsuffix/2.2.2/nager.publicsuffix.2.2.2.nupkg.sha512",
+    "/home/menno/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512",
+    "/home/menno/.nuget/packages/restsharp/106.11.7/restsharp.106.11.7.nupkg.sha512"
+  ],
+  "logs": []
+}
