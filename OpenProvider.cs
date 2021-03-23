@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using Nager.PublicSuffix;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace OpenProvider.NET
@@ -15,6 +17,7 @@ namespace OpenProvider.NET
         private string baseVersion {get; set;}
         public long resellerId {get; set;}
         public bool useDomainCache {get;set;}
+        public int domainCacheExpireHours {get;set;}
 
         public string domainsCache
         {
@@ -24,7 +27,7 @@ namespace OpenProvider.NET
                 {
                     DateTime cache = File.GetLastWriteTime(Environment.CurrentDirectory + "/domains.cache");
 
-                    if ((DateTime.Now - cache).Hours > 24)
+                    if ((DateTime.Now - cache).Hours > domainCacheExpireHours)
                     {
                         File.Delete(Environment.CurrentDirectory + "/domains.cache");
                         return null;
@@ -62,7 +65,7 @@ namespace OpenProvider.NET
             }
             else
             {
-                result = null;
+                result = response.Content;
                 return false;;
             }
         }
@@ -113,18 +116,6 @@ namespace OpenProvider.NET
             else
                 return null;
         }
-        /*
-        {
-            "application_mode": "preregistration",
-            "domains": [
-                {
-                "extension": "me",
-                "name": "vleeuwen"
-                }
-            ],
-            "with_price": true
-        }
-*/
 
         public bool Authenticate(string user, string pass)
         {
@@ -189,6 +180,141 @@ namespace OpenProvider.NET
                 return null;
         }
 
+        [Obsolete("This function uses the XML API as the REST API is currently broken for this function!")]
+        public List<NameServerGroup> GetNSGroups(string user, string pass)
+        {
+            var client = new RestClient($"{this.baseUrl}/searchNsGroupRequest");
+            var request = new RestRequest(Method.POST);
+
+            request.AddHeader("Content-Type", "application/xml");
+            request.AddParameter("undefined", $@"<?xml version=""1.0"" encoding=""UTF-8""?>
+                                                <openXML>
+                                                    <credentials>
+                                                        <username>{user}</username>
+                                                        <password>{pass}</password>
+                                                    </credentials>
+                                                    <searchNsGroupRequest />
+                                                </openXML>", ParameterType.RequestBody);
+            
+            IRestResponse response = client.Execute(request);
+            XmlDocument responseNode = new XmlDocument();
+            Dictionary<string, object> responseDocument = new Dictionary<string, object>();
+
+            responseNode.LoadXml(response.Content);
+
+            List<NameServerGroup> groups = new List<NameServerGroup>();
+            XmlNodeList xnList = responseNode.SelectNodes("/openXML/reply/data/results/array/item");
+            foreach (XmlNode xn in xnList)
+            {
+                NameServerGroup group = new NameServerGroup();
+
+                group.name = xn.SelectSingleNode("nsGroup").InnerText;
+                group.id = long.Parse(xn.SelectSingleNode("id").InnerText);
+
+                foreach (XmlNode nsObj in xn.SelectNodes("nameServers/array/item"))
+                {
+                    NameServer ns = new NameServer();
+
+                    ns.id = long.Parse(nsObj.SelectSingleNode("id").InnerText);
+                    ns.seqNo = long.Parse(nsObj.SelectSingleNode("seqNr").InnerText);
+                    ns.domainName = nsObj.SelectSingleNode("name").InnerText;
+                    ns.ipv4 = nsObj.SelectSingleNode("ip").InnerText;
+                    ns.ipv6 = nsObj.SelectSingleNode("ip6").InnerText;
+
+                    group.nameServers.Add(ns);
+                }
+                groups.Add(group);
+            }
+            return groups;
+        }
+
+        public bool CreateNSGroup(List<NameServer> nameServers, string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+                return false;
+            
+            List<Dictionary<string, object>> nameServerDicts = new List<Dictionary<string, object>>();
+            foreach (NameServer ns in nameServers)
+            {
+                Dictionary<string, object> nsDict = new Dictionary<string, object>();
+
+                nsDict.Add("ip", ns.ipv4);
+                nsDict.Add("ip6", ns.ipv6);
+                nsDict.Add("name", ns.domainName);
+                nsDict.Add("seq_nr", ns.seqNo);
+                
+                nameServerDicts.Add(nsDict);
+            }
+
+            bool success = request("/dns/nameservers/groups", Method.POST, out string resp, new Dictionary<string, dynamic> () 
+            {
+                { "name_servers", nameServerDicts },
+                { "ns_group", groupName }
+            });
+
+            if (!success)
+                return false;
+
+            Dictionary<string, object> responseJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(resp);
+
+            if (((JObject)responseJson["data"]).ToObject<Dictionary<string, bool>>()["success"] == true)
+                return true;
+            else
+                return false;
+        }
+
+        public bool UpdateNSGroup(List<NameServer> nameServers, string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+                return false;
+            
+            List<Dictionary<string, object>> nameServerDicts = new List<Dictionary<string, object>>();
+            foreach (NameServer ns in nameServers)
+            {
+                Dictionary<string, object> nsDict = new Dictionary<string, object>();
+
+                nsDict.Add("ip", ns.ipv4);
+                nsDict.Add("ip6", ns.ipv6);
+                nsDict.Add("name", ns.domainName);
+                nsDict.Add("seq_nr", ns.seqNo);
+                
+                nameServerDicts.Add(nsDict);
+            }
+
+            bool success = request("/dns/nameservers/groups/"+groupName, Method.PUT, out string resp, new Dictionary<string, dynamic> () 
+            {
+                { "name_servers", nameServerDicts }
+            });
+
+            if (!success)
+                return false;
+
+            Dictionary<string, object> responseJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(resp);
+
+            if (((JObject)responseJson["data"]).ToObject<Dictionary<string, bool>>()["success"] == true)
+                return true;
+            else
+                return false;
+        }
+
+        public bool DeleteNSGroup(string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+                return false;
+            
+            bool success = request("/dns/nameservers/groups/"+groupName, Method.DELETE, out string resp);
+
+            if (!success)
+                return false;
+
+            Dictionary<string, object> responseJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(resp);
+
+            if (((JObject)responseJson["data"]).ToObject<Dictionary<string, bool>>()["success"] == true)
+                return true;
+            else
+                return false;
+        }
+
         public void InvalidateDomainCache()
         {
             if (File.Exists(Environment.CurrentDirectory + "/domains.cache"))
@@ -200,6 +326,7 @@ namespace OpenProvider.NET
             this.baseUrl = baseUrl;
             this.baseVersion = baseVersion;
             this.useDomainCache = true;
+            this.domainCacheExpireHours = 24;
         }
 
         public OP(bool useDomainCache)
@@ -207,6 +334,7 @@ namespace OpenProvider.NET
             this.baseUrl = "https://api.openprovider.eu/";
             this.baseVersion = "v1beta";
             this.useDomainCache = useDomainCache;
+            this.domainCacheExpireHours = 24;
         }
 
         public OP()
@@ -214,6 +342,7 @@ namespace OpenProvider.NET
             this.baseUrl = "https://api.openprovider.eu/";
             this.baseVersion = "v1beta";
             this.useDomainCache = true;
+            this.domainCacheExpireHours = 24;
         }
     }
 }

@@ -21,6 +21,7 @@ namespace OpenProvider.NET
 
     public class NameServer
     {
+        public long id {get; set;}
         public long seqNo {get; set;}
         public string domainName {get; set;}
         public string ipv4 {get; set;}
@@ -37,6 +38,18 @@ namespace OpenProvider.NET
 
             if (nameServer.ContainsKey("ip6"))
                 this.ipv6 = nameServer["ip6"];
+        }
+    }
+
+    public class NameServerGroup
+    {
+        public long id {get; set;}
+        public string name {get; set;}
+        public List<NameServer> nameServers {get;set;}
+
+        public NameServerGroup()
+        {
+            nameServers = new List<NameServer>();
         }
     }
 
