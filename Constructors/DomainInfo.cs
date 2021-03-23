@@ -5,67 +5,6 @@ using System.Linq;
 
 namespace OpenProvider.NET
 {
-    public class Domain
-    {
-        public string domainName {get; set;}
-        public string extension {get; set;}
-
-        public Domain() {}
-
-        public Domain(Dictionary<string, string> raw)
-        {
-            this.domainName = raw["name"];
-            this.extension = raw["extension"];
-        }
-    }
-
-    public class NameServer
-    {
-        public long id {get; set;}
-        public long seqNo {get; set;}
-        public string domainName {get; set;}
-        public string ipv4 {get; set;}
-        public string ipv6 {get; set;}
-
-        public NameServer() {}
-        public NameServer(Dictionary<string, string> nameServer)
-        {
-            this.seqNo = long.Parse(nameServer["seq_nr"]);
-            this.domainName = nameServer["name"];
-
-            if (nameServer.ContainsKey("ip"))
-                this.ipv6 = nameServer["ip"];
-
-            if (nameServer.ContainsKey("ip6"))
-                this.ipv6 = nameServer["ip6"];
-        }
-    }
-
-    public class NameServerGroup
-    {
-        public long id {get; set;}
-        public string name {get; set;}
-        public List<NameServer> nameServers {get;set;}
-
-        public NameServerGroup()
-        {
-            nameServers = new List<NameServer>();
-        }
-    }
-
-    public enum DNSSecMode
-    {
-        Unsigned = 0,
-        SignedDelegation = 1
-    }
-
-    public enum AutoRenew
-    {
-        Default = 0,
-        On = 1,
-        Off = 1,
-    }
-
     public class DomainInfo
     {
         public long id {get; set;}
