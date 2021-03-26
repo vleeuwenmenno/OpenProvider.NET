@@ -297,6 +297,30 @@ namespace OpenProvider.NET
                 return false;
         }
 
+        public bool UpdateDomainNSGroup(DomainInfo domain, string nsGroupName)
+        {
+            InvalidateDomainCache();
+            return request("/domains/"+domain.id, Method.PUT, out string resp, new Dictionary<string, dynamic> () 
+            {
+                { "ns_group", nsGroupName }
+            });
+        }
+
+        public bool UpdateDomainNameServers(DomainInfo domain, List<NameServer> nameServers)
+        {
+            InvalidateDomainCache();
+            List<Dictionary<string, string>> nsrvs = new List<Dictionary<string, string>>();
+
+            foreach (NameServer ns in nameServers)
+                nsrvs.Add(new Dictionary<string, string>() { { "name", ns.domainName }, { "ip", ns.ipv4 }, { "ip6", ns.ipv6 } });
+
+            return request("/domains/"+domain.id, Method.PUT, out string resp, new Dictionary<string, dynamic> () 
+            {
+                { "ns_group", null },
+                { "name_servers", nsrvs }
+            });
+        }
+
         public bool DeleteNSGroup(string groupName)
         {
             if (string.IsNullOrEmpty(groupName))
