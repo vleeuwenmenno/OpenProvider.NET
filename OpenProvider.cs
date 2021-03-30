@@ -76,11 +76,18 @@ namespace OpenProvider.NET
 
             foreach(string domain in domains)
             {
-                Nager.PublicSuffix.DomainInfo info = new DomainParser(new WebTldRuleProvider()).Parse(domain);
-                domainList.Add(new Dictionary<string, string>() {
-                    { "name", info.Domain },
-                    { "extension", info.TLD }
-                });
+                try
+                {
+                    Nager.PublicSuffix.DomainInfo info = new DomainParser(new WebTldRuleProvider()).Parse(domain);
+                    domainList.Add(new Dictionary<string, string>() {
+                        { "name", info.Domain },
+                        { "extension", info.TLD }
+                    });
+                }
+                catch (ParseException)
+                {
+                    return null;
+                }
             }
 
             bool success = request("/domains/check", Method.POST, out string resp, new Dictionary<string, dynamic> () 

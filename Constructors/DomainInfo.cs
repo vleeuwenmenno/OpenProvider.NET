@@ -14,6 +14,7 @@ namespace OpenProvider.NET
         public bool canRenew {get; set;}
 
         public string authCode {get; set;}
+        public string registar {get; set;}
 
         public Domain domain {get; set;}
         public List<NameServer> nameservers {get; set;}
@@ -33,6 +34,8 @@ namespace OpenProvider.NET
 
         public DomainInfo(Dictionary<string, object> rawData)
         {
+            this.registar = "Openprovider";
+
             foreach (KeyValuePair<string, object> domain in rawData)
             {
                 switch (domain.Key)
