@@ -14,5 +14,13 @@ namespace OpenProvider.NET
             this.domainName = raw["name"];
             this.extension = raw["extension"];
         }
+
+        public string fullDomain
+        {
+            get
+            {
+                return domainName + "." + extension;
+            }
+        }
     }
 }

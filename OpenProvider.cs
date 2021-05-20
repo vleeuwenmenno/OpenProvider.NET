@@ -27,7 +27,7 @@ namespace OpenProvider.NET
                 {
                     DateTime cache = File.GetLastWriteTime(Environment.CurrentDirectory + "/domains.cache");
 
-                    if ((DateTime.Now - cache).Hours > domainCacheExpireHours)
+                    if ((DateTime.Now - cache).TotalHours > domainCacheExpireHours)
                     {
                         File.Delete(Environment.CurrentDirectory + "/domains.cache");
                         return null;
@@ -357,7 +357,7 @@ namespace OpenProvider.NET
             this.baseUrl = baseUrl;
             this.baseVersion = baseVersion;
             this.useDomainCache = true;
-            this.domainCacheExpireHours = 24;
+            this.domainCacheExpireHours = 3;
         }
 
         public OP(bool useDomainCache)
@@ -365,7 +365,7 @@ namespace OpenProvider.NET
             this.baseUrl = "https://api.openprovider.eu/";
             this.baseVersion = "v1beta";
             this.useDomainCache = useDomainCache;
-            this.domainCacheExpireHours = 24;
+            this.domainCacheExpireHours = 3;
         }
 
         public OP()
@@ -373,7 +373,7 @@ namespace OpenProvider.NET
             this.baseUrl = "https://api.openprovider.eu/";
             this.baseVersion = "v1beta";
             this.useDomainCache = true;
-            this.domainCacheExpireHours = 24;
+            this.domainCacheExpireHours = 3;
         }
     }
 }
