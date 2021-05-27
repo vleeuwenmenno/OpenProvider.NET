@@ -124,16 +124,24 @@ namespace OpenProvider.NET
                 return null;
         }
 
-        public bool Authenticate(string user, string pass)
+        public bool Authenticate(string user, string pass, bool dev)
         {
-            return Authenticate(user, pass, out Dictionary<string, object> notUsed);
+            return Authenticate(user, pass, dev, out Dictionary<string, object> notUsed);
         }
 
-        public bool Authenticate(string user, string pass, out Dictionary<string, object> ifconfigResult)
+        public bool Authenticate(string user, string pass, bool dev, out Dictionary<string, object> ifconfigResult)
         {
             var client = new RestClient($"{baseUrl}{baseVersion}/auth/login");
             var request = new RestRequest(Method.POST);
-            ifconfigResult = Utilities.ifconfig;
+
+            if (dev)
+                ifconfigResult = new Dictionary<string, object>()
+                {
+                    {"ip", ""}
+                };
+            else
+                ifconfigResult = Utilities.ifconfig;
+
             Dictionary<string, string> body = new Dictionary<string, string>() 
             {
                 { "ip", (string)ifconfigResult["ip"] },
