@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Nager.PublicSuffix;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -76,18 +75,10 @@ namespace OpenProvider.NET
 
             foreach(string domain in domains)
             {
-                try
-                {
-                    Nager.PublicSuffix.DomainInfo info = new DomainParser(new WebTldRuleProvider()).Parse(domain);
-                    domainList.Add(new Dictionary<string, string>() {
-                        { "name", info.Domain },
-                        { "extension", info.TLD }
-                    });
-                }
-                catch (ParseException)
-                {
-                    return null;
-                }
+                domainList.Add(new Dictionary<string, string>() {
+                    { "name", domain },
+                    { "extension", domain.Split('.').Last() }
+                });
             }
 
             bool success = request("/domains/check", Method.POST, out string resp, new Dictionary<string, dynamic> () 
