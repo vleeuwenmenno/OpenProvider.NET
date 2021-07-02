@@ -75,9 +75,10 @@ namespace OpenProvider.NET
 
             foreach(string domain in domains)
             {
+                DomainParser domainParser = new DomainParser(domain);
                 domainList.Add(new Dictionary<string, string>() {
-                    { "name", domain },
-                    { "extension", domain.Split('.').Last() }
+                    { "name", domainParser.domainParts.First() },
+                    { "extension", domainParser.TLD }
                 });
             }
 
